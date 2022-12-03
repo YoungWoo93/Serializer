@@ -2,25 +2,37 @@
 #include <string>
 #include <Windows.h>
 
-class BaseSerializer {
+class BaseSerializer 
+{
 public:
 	BaseSerializer()
-		:bufferPtr((char*)_aligned_malloc(64, 64)), bufferSize(64), headPtr(bufferPtr), tailPtr(bufferPtr) {	// c++ allocator 를 이용해 64바이트 (캐시라인) 경계에 서도록 짜보자
+		:bufferPtr((char*)_aligned_malloc(64, 64)), bufferSize(64), headPtr(bufferPtr), tailPtr(bufferPtr), useHeap(false), heap(0) {	// c++ allocator 를 이용해 64바이트 (캐시라인) 경계에 서도록 짜보자
 	}																					//    aligned alloc 구현 이후
 	BaseSerializer(const size_t _size)
-		:bufferPtr((char*)_aligned_malloc(_size, 64)), bufferSize(_size), headPtr(bufferPtr), tailPtr(bufferPtr) {
+		:bufferPtr((char*)_aligned_malloc(_size, 64)), bufferSize(_size), headPtr(bufferPtr), tailPtr(bufferPtr), useHeap(false), heap(0) {
+	}
+	BaseSerializer(HANDLE _heap)
+		:bufferPtr((char*)HeapAlloc(_heap, NULL, 64)), bufferSize(64), headPtr(bufferPtr), tailPtr(bufferPtr), useHeap(true), heap(_heap) {	// c++ allocator 를 이용해 64바이트 (캐시라인) 경계에 서도록 짜보자
+	}																					//    aligned alloc 구현 이후
+	BaseSerializer(HANDLE _heap, const size_t _size)
+		:bufferPtr((char*)HeapAlloc(_heap, NULL, _size)), bufferSize(_size), headPtr(bufferPtr), tailPtr(bufferPtr), useHeap(true), heap(_heap) {
 	}
 	BaseSerializer(const BaseSerializer& s)
 		:bufferPtr((char*)_aligned_malloc(s.bufferSize, 64))
 		, bufferSize(s.bufferSize)
 		, headPtr(bufferPtr + (s.headPtr - s.bufferPtr))
-		, tailPtr(bufferPtr + (s.tailPtr - s.bufferPtr)) {
+		, tailPtr(bufferPtr + (s.tailPtr - s.bufferPtr))
+		, useHeap(s.useHeap)
+		, heap(s.heap) {
 		memmove(headPtr, s.headPtr, s.tailPtr - s.headPtr);
 	}
 
 	virtual ~BaseSerializer() {
 		//clear();
-		_aligned_free(bufferPtr);
+		if (useHeap)
+			HeapFree(heap, 0, bufferPtr);
+		else
+			_aligned_free(bufferPtr);
 		//delete[] bufferPtr;
 	}
 
@@ -154,4 +166,7 @@ protected:
 
 	char* headPtr;
 	char* tailPtr;
+
+	bool useHeap;
+	HANDLE heap;
 };

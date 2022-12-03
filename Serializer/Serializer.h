@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <Windows.h>
 
@@ -11,6 +12,12 @@ public:
 	}																					//    aligned alloc 구현 이후
 	serializer(const size_t _size)
 		:BaseSerializer(_size) {
+	}
+	serializer(HANDLE heap)
+		:BaseSerializer(heap) {
+	}
+	serializer(HANDLE heap, const size_t _size)
+		:BaseSerializer(heap, _size) {
 	}
 	serializer(const serializer& s)
 		:BaseSerializer(s) {
@@ -76,3 +83,4 @@ public:
 
 	virtual serializer& operator = (serializer& v);
 };
+

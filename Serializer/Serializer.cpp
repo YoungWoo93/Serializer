@@ -1,8 +1,5 @@
 #include "Serializer.h"
 
-
-
-
 size_t serializer::push(const char* _data, size_t _size)
 {
 	if (useableSize() < _size) {

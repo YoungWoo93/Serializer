@@ -46,7 +46,12 @@ void BaseSerializer::clear()
 
 char* BaseSerializer::resize(const size_t _size)
 {
-	auto tempPtr = (char*)_aligned_malloc(_size, 64);
+	char* tempPtr;
+	
+	if (useHeap)
+		tempPtr = (char*)HeapAlloc(heap, 0, _size);
+	else
+		tempPtr = (char*)_aligned_malloc(_size, 64);
 
 	clean();
 	memmove(tempPtr, bufferPtr, tailPtr - bufferPtr);
@@ -54,7 +59,11 @@ char* BaseSerializer::resize(const size_t _size)
 	tailPtr += tempPtr - bufferPtr;
 	bufferSize = _size;
 
-	_aligned_free((char*)bufferPtr);
+	if (useHeap)
+		HeapFree(heap, 0, bufferPtr);
+	else
+		_aligned_free((char*)bufferPtr);
+		
 	bufferPtr = tempPtr;
 
 	return bufferPtr;
