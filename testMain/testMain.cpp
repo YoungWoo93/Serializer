@@ -393,10 +393,50 @@ void RingBufferToSerializerTest()
 	}
 }
 
+void serializer_packetSerializer_test()
+{
+	packetSerializer p(32);
+	serializer s16(16);
+	serializer s32(32);
+	serializer s64(64);
+
+	p << (int)1234;
+	p.printbuffer();
+
+	s16 = p;
+	s16.printbuffer();
+	s32 = p;
+	s32.printbuffer();
+	s64 = p;
+	s64.printbuffer();
+
+	s16 << (int)4567;
+	s16.printbuffer();
+	s32 << (int)4567;
+	s32.printbuffer();
+	s64 << (int)4567;
+	s64.printbuffer();
+	
+	p = s16;
+	p.printbuffer();
+	p = s32;
+	p.printbuffer();
+	p = s64;
+	p.printbuffer();
+
+	s64 << (int)1 << (int)1 << (int)1 << (int)1 << (int)1 << (int)1 << (int)1;
+	s64.printbuffer();
+
+	p = s64;
+	p.printbuffer();
+
+}
 
 void main()
 {
-	RingBufferToSerializerTest();
+	serializer_packetSerializer_test();
+
+	//RingBufferToSerializerTest();
 
 	//loopTestOperator();
 	//loopTestFunction();
