@@ -8,6 +8,7 @@
 #endif
 
 #include "../Serializer/Serializer.h"
+#include "../Serializer/PacketSerializer.h"
 #include "RingBuffer/RingBuffer/RingBuffer.h"
 
 
@@ -432,9 +433,28 @@ void serializer_packetSerializer_test()
 
 }
 
+void test() 
+{
+	string str1 = "0123456789";
+	string str2 = "Å×½ºÆ®";
+
+	serializer sendBuffer;
+
+	sendBuffer << str1 << str2;
+
+	string result;
+	sendBuffer >> result;
+	cout << result << endl;
+	
+	sendBuffer >> result;
+	cout << result << endl;
+}
+
 void main()
 {
-	serializer_packetSerializer_test();
+	test();
+
+	//serializer_packetSerializer_test();
 
 	//RingBufferToSerializerTest();
 
